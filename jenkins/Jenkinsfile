@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.0'
+            args '-v /root/.m2:/root/.m2'
+        }
+    }
     stages {
         stage('Build') {
             steps {
@@ -18,18 +23,7 @@ pipeline {
         }
         stage('Deliver') {
             steps {
-                script {
-                    // Ange sökvägen till JAR-filen baserat på Maven-utgången
-                    def JAR_PATH = "target/my-app-1.0-SNAPSHOT.jar"
-
-                    // Kolla om JAR-filen finns på den angivna sökvägen
-                    if (!fileExists(JAR_PATH)) {
-                        error "Error: JAR file not found at $JAR_PATH. Please check the path."
-                    }
-
-                    // Kör ditt leveransskript
-                    sh "./jenkins/scripts/deliver.sh"
-                }
+                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
